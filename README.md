@@ -35,6 +35,36 @@ sudo perf script | head
 
 Lines should show non-zero accessed addresses.
 
+## Running on a fresh Ubuntu live USB
+
+The tracer needs bare-metal hardware access to the AMD IBS PMU, which no
+hypervisor (WSL2, VirtualBox, most cloud KVM guests, Hyper-V) exposes.
+The fastest way to get a working environment is to boot Ubuntu from a
+USB stick in "Try Ubuntu" mode — no install required, nothing on the
+host is touched. Ubuntu 24.04 LTS is the recommended image.
+
+Once booted into the live session, open a terminal and run:
+
+```bash
+sudo apt update
+sudo apt install -y build-essential git \
+                    python3-matplotlib python3-numpy python3-tk
+sudo sysctl kernel.perf_event_paranoid=2
+
+# Sanity check — must print an integer:
+cat /sys/bus/event_source/devices/ibs_op/type
+
+git clone https://github.com/graurgg/perf_monitor.git
+cd perf_monitor
+make
+./tracer -p 10000 -- ./bench/linear --size-mb=256 --iters=200 --mode=rw \
+    | ./plot.py
+```
+
+A two-panel matplotlib window should appear and update live as the
+benchmark walks its buffer. Capture screenshots before shutting down the
+live session — nothing persists across reboot.
+
 ## Build
 
 ```bash
