@@ -1,5 +1,10 @@
 tracer
 bench/linear
+bench/random
+bench/pointer_chase
+bench/multi_object
 *.o
 samples.txt
+perf.data
 __pycache__/
+/perf_monitor/
